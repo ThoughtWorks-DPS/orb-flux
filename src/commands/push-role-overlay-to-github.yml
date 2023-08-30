@@ -89,10 +89,5 @@ steps:
         SOURCEFILE: overlays/<< parameters.pipeline-name >>/<< parameters.role >>/<< parameters.role >>-<< parameters.app-name >>
         # yamllint disable-line rule:line-length
         UPDATEDFILE: chart/overlays/<< parameters.role >>-<< parameters.app-name >>
-      command: |
-        echo "<< parameters.org-name >>"
-        echo "<< parameters.repo-name >>"
-        echo "overlays/<< parameters.pipeline-name >>/<< parameters.role >>/<< parameters.role >>-<< parameters.app-name >>"
-        echo "chart/overlays/<< parameters.role >>-<< parameters.app-name >>"
-        <<include(scripts/write_single_file_to_github.sh)>> \
+      command: <<include(scripts/write_single_file_to_github.sh)>> \
 
