@@ -4,6 +4,8 @@ version: 2.1
 description: |
   An envolving orb for managing elements of flux on kubernetes.
 
+  Initial capabilities support distributed, multi-region cluster environments.
+
 display:
   source_url: "https://github.com/ThoughtWorks-DPS/orb-flux"
   home_url: "https://github.com/ThoughtWorks-DPS/orb-flux"
