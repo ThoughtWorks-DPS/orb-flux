@@ -2,15 +2,15 @@
 
 # Script: Use curl to write a single file to github repo
 
-export ORG=$1
-export REPO=$2
-export SOURCEFILE=$3
-export UPDATEDFILE=$4
+# export ORG=$1
+# export REPO=$2
+# export SOURCEFILE=$3
+# export UPDATEDFILE=$4
 # export APPS=environments/versions.json
 
 echo "debug:"
-echo "ORG: $ORG"
-echo "REPO: $REPO"
+echo "ORG: ${ORG}"
+echo "REPO: ${REPO}"
 echo "SOURCEFILE: ${SOURCEFILE}"
 echo "UPDATEDFILE: ${UPDATEDFILE}"
 
