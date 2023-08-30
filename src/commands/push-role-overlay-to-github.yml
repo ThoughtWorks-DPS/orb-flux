@@ -86,7 +86,7 @@ steps:
         ORG: << parameters.org-name >>
         REPO: << parameters.repo-name >>
         # yamllint disable-line rule:line-length
-        SOURCEFILE: overlays/<< parameters.pipeline-name >>/<< parameters.role >>/<< parameters.role >>-<< parameters.app-name >>
+        SOURCEFILE: overlays/<< parameters.pipeline-name >>/<< parameters.role >>/<< parameters.role >>-<< parameters.app-name >>.yaml
         # yamllint disable-line rule:line-length
-        UPDATEDFILE: chart/overlays/<< parameters.role >>-<< parameters.app-name >>
+        UPDATEDFILE: chart/overlays/<< parameters.role >>-<< parameters.app-name >>.yaml
       command: <<include(scripts/write_single_file_to_github.sh)>>
