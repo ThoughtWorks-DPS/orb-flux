@@ -8,7 +8,7 @@ orbs:
   orb-tools: circleci/orb-tools@12.0.4
 
 globals:
-  - &context empc-lab
+  - &context twdps-orb-authors
   - &orb-name twdps/flux-aoa
 
 on-push-main: &on-push-main

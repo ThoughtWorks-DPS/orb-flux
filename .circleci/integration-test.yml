@@ -1,0 +1,69 @@
+---
+version: 2.1
+
+orbs:
+  flux: twdps/flux@dev:<<pipeline.git.revision>>
+  orb-tools: circleci/orb-tools@12.0.4
+
+globals:
+  - &context empc-lab
+  - &orb-name twdps/flux
+
+# on-push-main: &on-push-main
+#   branches:
+#     only: /main/
+#   tags:
+#     ignore: /.*/
+
+# on-tag-main: &on-tag-main
+#   branches:
+#     ignore: /.*/
+#   tags:
+#     only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+
+jobs:
+
+  test envsubst-overlays-from-templates:
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: cimg/base:current
+    environment:
+      CHART_VERSION: 1.0.0
+    steps:
+      - checkout
+      - flux/envsubst-overlays-from-templates:
+          role: prod
+          app-name: sample-app
+      - run: 
+          name: test sample template file 
+          command: |
+            export result=$(cmp -s chart/overlays/compare.yaml chart/overlays/prod-sample-app.yaml; echo $?)
+            if [[ $result -ne 0 ]]; then
+              echo "error: prod-sample-app.yaml does not match expected output"
+              exit 1
+            fi
+
+  test install-flux:
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - flux/install-flux:
+          flux-version: 2.0.0
+      - run: 
+          name: test flux version
+          command: |
+            export v=$(flux version --client)
+            if [[ ! $v =~ "2.0.0" ]]; then
+              echo "error: expected flux version 2.0.0 but received ${v}"
+              exit 1
+            fi
+
+workflows:
+  version: 2
+
+  integration tests:
+    jobs:
+      - test envsubst-overlays-from-templates
+      - test install-flux
