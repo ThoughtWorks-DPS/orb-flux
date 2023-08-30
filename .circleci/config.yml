@@ -9,7 +9,7 @@ orbs:
 
 globals:
   - &context twdps-orb-authors
-  - &orb-name twdps/flux-aoa
+  - &orb-name twdps/flux
 
 on-push-main: &on-push-main
   branches:
