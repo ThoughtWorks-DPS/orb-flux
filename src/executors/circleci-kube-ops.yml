@@ -33,5 +33,5 @@ resource_class: << parameters.resource-class >>
 docker:
   - image: << parameters.executor-image >>
     auth:
-      username: ${<< parameters.username >>}
-      password: ${<< parameters.password >>}
+      username: ${<< parameters.registry-username >>}
+      password: ${<< parameters.registry-password >>}

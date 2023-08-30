@@ -2,7 +2,7 @@
 ---
 description: |
   Deploy application upgrades to a flux app-of-app control plane repo.
-  
+
   Built to support a distributed flux control-plane model for multi-cluster
   environments. See discussion here (pending).
 
@@ -10,8 +10,8 @@ executor:
   name: circleci-kube-ops
   executor-image: << parameters.executor-image >>
   resource-class: << parameters.resource-class >>
-  username: << parameters.registry-username >>
-  password: << parameters.registry-password >>
+  registry-username: << parameters.registry-username >>
+  registry-password: << parameters.registry-password >>
 
 parameters:
 

@@ -2,7 +2,8 @@
 ---
 description: |
   This command pushes a role-level overlay file to a flux app-of-apps repo
-  to the role directory based on the multi-cluster, regional deployment conventions.
+  to the role directory based on the multi-cluster, regional
+  deployment conventions.
 
   The app-of-apps repo includes the following layout for individual apps:
 
