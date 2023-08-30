@@ -1,0 +1,111 @@
+# src/jobs/deploy-by-role.yml
+---
+description: |
+  Deploy application upgrades to a flux app-of-app control plane repo.
+  
+  Built to support a distributed flux control-plane model for multi-cluster
+  environments. See discussion here (pending).
+
+executor:
+  name: circleci-kube-ops
+  executor-image: << parameters.executor-image >>
+  resource-class: << parameters.resource-class >>
+  username: << parameters.registry-username >>
+  password: << parameters.registry-password >>
+
+parameters:
+
+  org-name:
+    description: github organization name
+    type: string
+  repo-name:
+    description: github repository name
+    type: string
+  app-name:
+    description: application name
+    type: string
+  pipeline-name:
+    description: current pipeline
+    type: string
+  role:
+    description: push values changes to this role
+    type: string
+
+  executor-image:
+    description: override defatul executor image
+    type: string
+    default: ghcr.io/rbmarketplace/di-circleci-kube-ops:alpine-stable
+
+  registry-username:
+    description: |
+      Environment variable to reference as username for the registry specified
+      by executor-image parameter
+    type: env_var_name
+    default: DOCKER_LOGIN
+
+  registry-password:
+    description: |
+      Environment variable to reference as password for the registry specified
+      by executor-image parameter
+    type: env_var_name
+    default: DOCKER_PASSWORD
+
+  resource-class:
+    type: enum
+    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    default: medium
+
+  shell:
+    description: |
+      default shell invocation. Override to support different shells or
+      tools like 1password.
+    type: string
+    default: /bin/bash -eo pipefail
+
+  use-default-envsubst:
+    description: |
+      Prior to pushing the template file, generate envsubst results from
+      <role>-<app name>.yaml.tpl - Set to false if you want to use some other
+      templating mechanism.
+    type: boolean
+    default: false
+
+  before-deploy:
+    description: |
+      run custom steps before pushing overlay file to app-of-apps repo
+    type: steps
+    default: []
+
+  after-deploy:
+    description: |
+      run custom steps after pushing overlay file to app-of-apps repo
+    type: steps
+    default: []
+
+steps:
+  - checkout
+  - setup_remote_docker
+  - when:
+      name: Run before-deploy lifecycle hook steps
+      condition: << parameters.before-deploy >>
+      steps: << parameters.before-deploy >>
+  - run:
+      name: template the overlay
+      command: echo "template"
+  - when:
+      name: Use default template envsubst
+      condition: << parameters.use-default-envsubst >>
+      steps:
+        - envsubst-overlays-from-templates:
+            role: << parameters.role >>
+            app-name: << parameters.app-name >>
+  - push-role-overlay-to-github:
+      org-name: << parameters.org-name >>
+      repo-name: << parameters.repo-name >>
+      app-name: << parameters.app-name >>
+      pipeline-name: << parameters.pipeline-name >>
+      role: << parameters.role >>
+  - when:
+      name: Run after-deploy lifecycle hook steps
+      condition: << parameters.after-deploy >>
+      steps: << parameters.after-deploy >>

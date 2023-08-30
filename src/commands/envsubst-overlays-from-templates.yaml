@@ -1,0 +1,29 @@
+# src/commands/envsubst-overlays-from-templates.yml
+# yamllint disable rule:line-length
+---
+description: |
+  Performs bash envsubst on template file to generate an overlay
+  for deployment.
+
+  Uses the following path/to/file.ext conventions:
+
+  Source: chart/overlays/<role>/<role>-<app-name>/yaml.tpl
+  Destination: chart/overlays/<role>/<role>-<app-name>.yaml
+
+parameters:
+
+  role:
+    description: push values changes to this role
+    type: string
+
+  app-name:
+    description: push changes for this application name
+    type: string
+
+steps:
+  - run:
+      name: test of push-overlay-file
+      command: |
+        envsubst < \
+        chart/overlays/<< parameters.role >>-<< parameters.app-name >>.yaml.tpl > \
+        chart/overlays/<< parameters.role >>-<< parameters.app-name >>.yaml

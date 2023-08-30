@@ -1,0 +1,82 @@
+---
+version: 2.1
+
+setup: true
+
+orbs:
+  shellcheck: circleci/shellcheck@3.1
+  orb-tools: circleci/orb-tools@12.0.4
+
+globals:
+  - &context empc-lab
+  - &orb-name twdps/flux-aoa
+
+on-push-main: &on-push-main
+  branches:
+    only: /main/
+  tags:
+    ignore: /.*/
+
+on-tag-main: &on-tag-main
+  branches:
+    ignore: /.*/
+  tags:
+    only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+
+workflows:
+  version: 2
+
+  orb build and test:
+    jobs:
+
+      - orb-tools/lint:
+          filters: *on-push-main
+
+      - orb-tools/review:
+          max_command_length: 100
+          exclude: RC006,RC010,RC007,RC003
+          filters: *on-push-main
+
+      - shellcheck/check:
+          filters: *on-push-main
+
+      - orb-tools/pack:
+          filters: *on-push-main
+
+      - orb-tools/publish:
+          name: publish development package
+          context: *context
+          orb_name: *orb-name
+          vcs_type: << pipeline.project.type >>
+          filters: *on-push-main
+          requires:
+            - orb-tools/lint
+            - orb-tools/review
+            - shellcheck/check
+            - orb-tools/pack
+
+      - orb-tools/continue:
+          name: Launch integration test pipeline
+          context: *context
+          orb_name: *orb-name
+          config_path: .circleci/integration-test.yml
+          pipeline_number: << pipeline.number >>
+          vcs_type: << pipeline.project.type >>
+          filters: *on-push-main
+          requires:
+            - publish development package
+
+  release:
+    jobs:
+      - orb-tools/pack:
+          filters: *on-tag-main
+
+      - orb-tools/publish:
+          name: publish release version
+          context: *context
+          orb_name: *orb-name
+          vcs_type: << pipeline.project.type >>
+          pub_type: production
+          filters: *on-tag-main
+          requires:
+            - orb-tools/pack

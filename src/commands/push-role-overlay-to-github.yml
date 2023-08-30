@@ -1,0 +1,91 @@
+# src/commands/push-role-overlay-to-github.yml
+---
+description: |
+  This command pushes a role-level overlay file to a flux app-of-apps repo
+  to the role directory based on the multi-cluster, regional deployment conventions.
+
+  The app-of-apps repo includes the following layout for individual apps:
+
+  # details listed only to the role-level
+  base/
+    <app name>/
+      kustomization.yaml
+      release.yaml
+      repository.yaml
+
+  overlays/
+    sandbox/
+      sbxdev/
+        sbxdev-<app name>.yaml
+      sbxqa/
+        sbxqa-<app name>.yaml
+      sbxmapi/
+        sbxmapi-<app name>.yaml
+    release/
+      preview/
+        preview-<app name>.yaml
+      nonprod/
+        nonprod-<app name>.yaml
+      prod/
+        prod-<app name>.yaml
+      mapi/
+        mapi-<app name>.yaml
+
+  The <role>-<app name>.yaml files represent the role overlay (values.yaml)
+  for the given role.
+
+  Given the listed parameters, this command writes the matching file from the
+  deployment repo to the app-of-apps repo.
+
+  By convention, the deployment repo to has the following file structure
+  layout related to these overlay files
+
+  /chart
+    base/
+      release.yaml             # These are the universal default settings.
+    overlays/
+      sbxdev-<app name>.yaml   # values for respective clusters
+      sbxqa-<app name>.yaml
+      sbxmapi-<app name>.yaml
+      preview-<app name>.yaml
+      nonprod-<app name>.yaml
+      prod-<app name>.yaml
+      mapi-<app name>.yaml
+
+  Note. The release.yaml defaults apply all deployed instances of the app, in
+  every cluster. By convention it is recommended that each overlay file includes
+  all possible custom keys (from the charts values.yaml), even where it uses a
+  setting equal to the default. The reason for this is that changes to
+  release.yml where this is not matching key in a role or instances overlay
+  will be immediatelyapplied to all running instances of the app everywhere,
+  in every cluster.
+
+parameters:
+
+  org-name:
+    description: github organization name
+    type: string
+  repo-name:
+    description: github repository name
+    type: string
+  app-name:
+    description: application name
+    type: string
+  pipeline-name:
+    description: current pipeline
+    type: string
+  role:
+    description: push values changes to this role
+    type: string
+
+steps:
+  - run:
+      name: Use Curl to push file to github
+      environment:
+        ORG: << parameters.org-name >>
+        REPO: << parameters.repo-name >>
+        # yamllint disable-line rule:line-length
+        SOURCEFILE: overlays/<< parameters.pipeline-name >>/<< parameters.role >>/<< parameters.role >>-<< parameters.app-name >>
+        # yamllint disable-line rule:line-length
+        UPDATEDFILE: chart/overlays/<< parameters.role >>-<< parameters.app-name >>
+      command: <<include(scripts/write_single_file_to_github.sh)>>

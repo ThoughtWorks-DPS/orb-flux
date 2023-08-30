@@ -1,2 +1,2 @@
 # orb-flux
-Evolving flux for kubernetes orb
+Evolving flux-for-kubernetes orb

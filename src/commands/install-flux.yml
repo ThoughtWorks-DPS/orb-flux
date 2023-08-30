@@ -1,0 +1,31 @@
+# src/commands/install-flux.yml
+# yamllint disable rule:line-length
+---
+description: Install flux2 cli. Supports latest or defined version.
+
+parameters:
+
+  flux-version:
+    description: install version
+    type: string
+    default: latest
+
+steps:
+  - when:
+      condition:
+        equal: [<< parameters.flux-version >>, "latest"]
+      steps:
+        - run:
+            name: install flux2 latest
+            command: curl -s https://fluxcd.io/install.sh | sudo bash
+  - unless:
+      condition:
+        equal: [<< parameters.flux-version >>, "latest"]
+      steps:
+        - run:
+            name: install requested version of flux
+            command: |
+              curl -SLO https://github.com/fluxcd/flux2/releases/download/v<< parameters.flux-version >>/flux_<< parameters.flux-version >>_linux_amd64.tar.gz
+              tar -xzf flux_<< parameters.flux-version >>_linux_amd64.tar.gz
+              sudo mv flux /usr/local/bin/flux
+              sudo rm flux_<< parameters.flux-version >>_linux_amd64.tar.gz

@@ -1,0 +1,37 @@
+# src/executors/di-circleci-kube-ops.yaml
+---
+description: |
+  By default the orb uses twdps/circleci-kube-ops:alpine-stable
+  as the executor image. You can override to use your own. We
+  recommand pinning executor version for normal usage.
+
+  See https://github.com/ThoughtWorks-DPS/circleci-kube-ops
+
+parameters:
+  executor-image:
+    description: available override
+    type: string
+    default: twdps/circleci-kube-ops:alpine-stable
+
+  resource-class:
+    type: enum
+    enum: [small, medium, medium+, large, xlarge, 2xlarge, 2xlarge+]
+    default: medium
+
+  registry-username:
+    description: username for executor registry authentication
+    type: env_var_name
+    default: DOCKER_LOGIN
+
+  registry-password:
+    description: password for executor registry authentication
+    type: env_var_name
+    default: DOCKER_PASSWORD
+
+resource_class: << parameters.resource-class >>
+
+docker:
+  - image: << parameters.executor-image >>
+    auth:
+      username: ${<< parameters.username >>}
+      password: ${<< parameters.password >>}

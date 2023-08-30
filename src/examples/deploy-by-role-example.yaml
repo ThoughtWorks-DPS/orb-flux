@@ -1,0 +1,40 @@
+# src/examples/deploy-by-role-example.yml
+---
+description: Sample usage for the deploy-by-role job.
+
+usage:
+
+  version: 2.1
+
+  orbs:
+    op: twdps/onepassword@1.0.0
+    flux: twdps/flux@0.0.0
+
+  workflows:
+    version: 2
+
+    portion-of-circlepipe-generated-workflow:
+      jobs:
+
+        # ...
+        # just a portion of a circlepipe generated workflow
+        # See https://github.com/ThoughtWorks-DPS/circlepipe
+
+        - flux/deploy-by-role:
+            name: deploy metrics-server update to preview
+            context: empc-lab
+            org-name: ThoughtWorks-DPS
+            repo-name: psk-service-metrics-server
+            app-name: metrics-server
+            pipeline-name: release
+            role: preview
+            before-deploy:
+              - op/env:
+                  env-file: op.env
+            filters:
+              branches:
+                ignore: /.*/
+              tags:
+                only: /^[0-9]+\.[0-9]+\.[0-9]+$/
+        
+        # ...
