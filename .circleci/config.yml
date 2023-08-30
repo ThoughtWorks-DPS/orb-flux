@@ -26,7 +26,7 @@ on-tag-main: &on-tag-main
 workflows:
   version: 2
 
-  orb build and test:
+  static analysis and test:
     jobs:
 
       - orb-tools/lint:
