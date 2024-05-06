@@ -1,9 +1,8 @@
 import os
 import unittest
-from pathlib import Path
 from unittest.mock import patch
 
-from src.scripts.python.write_single_file_to_github import RepositoryService, DirectoryService, Orchestrator
+from write_single_file_to_github import RepositoryService, DirectoryService, Orchestrator
 
 
 class GithubServiceTest(unittest.TestCase):
@@ -15,15 +14,15 @@ class GithubServiceTest(unittest.TestCase):
         self.test_local_files = [os.path.dirname(__file__) + "/local_file_fixture.txt"]
         self.test_github_token = "TEST_GITHUB_TOKEN"
 
-    @patch('src.scripts.python.write_single_file_to_github.Auth', autospec=True)
-    @patch('src.scripts.python.write_single_file_to_github.Github', autospec=True)
+    @patch('write_single_file_to_github.Auth', autospec=True)
+    @patch('write_single_file_to_github.Github', autospec=True)
     def test_configures_github_library_correctly(self, mock_github, mock_auth):
         RepositoryService(self.test_org, self.test_repo_name, self.test_github_token)
         mock_auth.Token.assert_called_once_with(self.test_github_token)
         mock_github.assert_called_once_with(auth=mock_auth.Token(self.test_github_token))
 
-    @patch('src.scripts.python.write_single_file_to_github.Auth', autospec=True)
-    @patch('src.scripts.python.write_single_file_to_github.Github', autospec=True)
+    @patch('write_single_file_to_github.Auth', autospec=True)
+    @patch('write_single_file_to_github.Github', autospec=True)
     def test_it_can_get_a_repo(self, mock_github, _):
         RepositoryService(self.test_org, self.test_repo_name, self.test_github_token)
         mock_github.return_value.get_repo.assert_called_once_with("TEST_ORG/TEST_REPO_NAME")
